@@ -1,0 +1,14 @@
+{
+  "name": "bitbot",
+  "version": "1.0.0",
+  "description": "Bits Management System",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "Bits of Good",
+  "license": "MIT",
+  "dependencies": {
+    "@slack/bolt": "^1.4.1"
+  }
+}
