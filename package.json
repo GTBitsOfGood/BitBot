@@ -9,6 +9,7 @@
   "author": "Bits of Good",
   "license": "MIT",
   "dependencies": {
-    "@slack/bolt": "^1.4.1"
+    "@slack/bolt": "^1.4.1",
+    "dotenv": "^8.2.0"
   }
 }
