@@ -1,5 +1,5 @@
 const { App } = require('@slack/bolt');
-require('dotenv').config();
+require('./config'); // sets config global variable and connects to the database
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
