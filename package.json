@@ -4,11 +4,17 @@
   "description": "Bits Management System",
   "main": "index.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "test": "jest ./tests --config ./jest.config.js"
   },
   "author": "Bits of Good",
   "license": "MIT",
   "dependencies": {
-    "@slack/bolt": "^1.4.1"
+    "@slack/bolt": "^1.4.1",
+    "mongoose": "^5.7.7"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.21",
+    "jest": "^24.9.0"
   }
 }
