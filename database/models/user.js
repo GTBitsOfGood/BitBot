@@ -14,7 +14,6 @@ const userSchema = new Schema({
     bitEvents: [{ type: ObjectId, ref: 'BitEvent' }]
 });
 userSchema.statics.findUser = async function(id) {
-    console.log(this);
     return this.findOne({id: id})
         .populate('bitEvents')
         .exec();
