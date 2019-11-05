@@ -3,6 +3,11 @@ const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
 
 const userSchema = new Schema({
+    slackID: {
+        type: String,
+        unique: true,
+        required: true,
+    },
     name: {
         type: String,
         required: true,
