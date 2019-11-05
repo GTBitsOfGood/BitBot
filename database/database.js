@@ -1,6 +1,6 @@
-const { user, userSchema } = require('./models/user.js');
-const { team, teamSchema } = require('./models/team');
-const { bitEvent, bitEventSchema } = require('./models/bit-event');
+const { User, userSchema } = require('./models/user.js');
+const { Team, teamSchema } = require('./models/team');
+const { BitEvent, bitEventSchema } = require('./models/bit-event');
 module.exports = {
-  user, team, bitEvent
+  User, Team, BitEvent
 };

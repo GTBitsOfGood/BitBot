@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { User } = require('./user');
 const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
 
@@ -7,11 +8,21 @@ const teamSchema = new Schema({
         type: String,
         required: true,
     },
-    members: [{ type: ObjectId, ref: 'User' }]
+    members: [
+        {
+            type: ObjectId,
+            ref: 'User',
+            validate: {
+                validator: async (value) => User.findById(value),
+                message: 'User does not exist in database'
+            },
+        }
+    ],
+
 });
 
-const team = mongoose.model('Team', teamSchema);
+const Team = mongoose.model('Team', teamSchema);
 module.exports = {
   teamSchema,
-  team
+  Team
 };
