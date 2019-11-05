@@ -60,7 +60,14 @@ test('Should find user and populate events', async (done) => {
     expect(user).toBeTruthy();
     expect(user.bitEvents.length).toBe(knownEventIDs.length);
     const usersBitsAccordingToEvents = user.bitEvents.map((bitEvent) => bitEvent.bits).reduce((a, b) => a + b);
+    expect(user.totalBits).toEqual(totalBits);
     expect(usersBitsAccordingToEvents).toEqual(totalBits);
+    done();
+});
+
+test('Should automatically calculate total bits', async (done) => {
+    const user = await User.findUser(userID);
+    expect(user.totalBits).toEqual(totalBits);
     done();
 });
 

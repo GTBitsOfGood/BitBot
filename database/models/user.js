@@ -33,7 +33,12 @@ const userSchema = new Schema({
 });
 // called after validation
 userSchema.pre('save', async function(next) {
-
+    const eventPromises = Promise.all(this.bitEvents.map((eventID) => BitEvent.findById(eventID)));
+    this.totalBits =
+        (await eventPromises)
+        .map((bitEvent) => bitEvent.bits)
+        .reduce((a, b) => a + b);
+    next();
 });
 
 userSchema.statics.findUser = async function(id) {
