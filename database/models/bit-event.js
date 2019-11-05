@@ -19,9 +19,9 @@ const bitEventSchema = new Schema({
         enum : ['user','admin'],
     }
 });
-const bitEvent = mongoose.model('BitEvent', bitEventSchema);
+const BitEvent = mongoose.model('BitEvent', bitEventSchema);
 
 module.exports = {
     bitEventSchema,
-    bitEvent
+    BitEvent
 };
