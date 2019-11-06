@@ -11,6 +11,10 @@ app.message('hello', ({ message, say }) => {
   say(`Hey there <@${message.user}>!`);
 });
 
+app.mention('add bits',  ({ message, say }) => {
+  say(`Testing`);
+})
+
 (async () => {
   await app.start(process.env.PORT || 3000);
   console.log(' BitBot! 🎉 ');
