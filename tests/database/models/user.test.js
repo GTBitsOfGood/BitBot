@@ -2,6 +2,11 @@ const { User, BitEvent } = require('../../../database/database');
 const crypto = require("crypto");
 
 
+const knownEventIDs = []; // events created just for these tests
+let userID = null;
+let totalBits = 0;
+let slackID = null;
+
 async function createBitEvent() {
     const bitCount = 100;
     totalBits += bitCount;
@@ -12,23 +17,20 @@ async function createBitEvent() {
         type: 'user'
     });
     return (await event.save()).id;
+
 }
-
 async function createUser(bitEventIDs) {
-    const uniqueID = crypto.randomBytes(20).toString('hex');
 
+    slackID = crypto.randomBytes(20).toString('hex');
     const user = new User({
-        slackID: uniqueID,
-        email: uniqueID + '@gmail.com',
+        slackID: slackID,
+        email: slackID + '@gmail.com',
         name: 'Test User',
         bitEvents: bitEventIDs,
     });
     return (await user.save()).id;
-}
 
-const knownEventIDs = []; // events created just for these tests
-let userID = null;
-let totalBits = 0;
+}
 beforeAll(async (done) => {
     knownEventIDs.push(await createBitEvent());
     knownEventIDs.push(await createBitEvent());
@@ -64,6 +66,17 @@ test('Should find user and populate events', async (done) => {
     expect(usersBitsAccordingToEvents).toEqual(totalBits);
     done();
 });
+
+test('Should find user by slack ID and populate events', async (done) => {
+    const user = await User.findUserBySlackID(slackID);
+    expect(user).toBeTruthy();
+    expect(user.bitEvents.length).toBe(knownEventIDs.length);
+    const usersBitsAccordingToEvents = user.bitEvents.map((bitEvent) => bitEvent.bits).reduce((a, b) => a + b);
+    expect(user.totalBits).toEqual(totalBits);
+    expect(usersBitsAccordingToEvents).toEqual(totalBits);
+    done();
+});
+
 
 test('Should automatically calculate total bits', async (done) => {
     const user = await User.findUser(userID);

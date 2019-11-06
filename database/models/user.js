@@ -37,6 +37,11 @@ userSchema.pre('save', async function(next) {
     next();
 });
 
+/**
+ * Finds user by Mongo id
+ * @param id - Mongo ID
+ * @returns {Promise<User>} with the bitEventID's replaced with bitEvents
+ */
 userSchema.statics.findUser = async function(id) {
     let output;
     if (mongoose.Types.ObjectId.isValid(id)) {
@@ -48,6 +53,18 @@ userSchema.statics.findUser = async function(id) {
     }
     return output;
 };
+
+/**
+ * Finds users by slackID
+ * @param slackID
+ * @returns {Promise<User>} with the bitEventID's replaced with bitEvents
+ */
+userSchema.statics.findUserBySlackID = async function(slackID) {
+    return this.findOne({slackID: slackID})
+        .populate('bitEvents')
+        .exec();;
+};
+
 
 userSchema.methods.syncTotalBitsWithEvents = async function() {
     const eventPromises = Promise.all(this.bitEvents.map((eventID) => BitEvent.findById(eventID)));
