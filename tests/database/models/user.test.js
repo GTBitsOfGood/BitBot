@@ -84,6 +84,21 @@ test('Should automatically calculate total bits', async (done) => {
     done();
 });
 
+test('Add a new bit event to user', async (done) => {
+    const newEventID = await createBitEvent();
+    let user = await User.findUser(userID);
+    user.bitEvents.push(newEventID);
+    await user.save();
+
+
+    // verify the bit events were updated
+    user = await User.findUserBySlackID(slackID);
+    expect(user).toBeTruthy();
+    expect(user.bitEvents.length).toBe(knownEventIDs.length + 1);
+    expect(user.totalBits).toEqual(totalBits);
+    done();
+});
+
 afterAll(async (done) => {
    // delete the old test events
     for(let eventId of knownEventIDs) {
