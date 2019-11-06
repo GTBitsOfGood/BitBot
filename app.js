@@ -11,9 +11,37 @@ app.message('hello', ({ message, say }) => {
   say(`Hey there <@${message.user}>!`);
 });
 
-app.mention('add bits',  ({ message, say }) => {
-  say(`Testing`);
-})
+// app.message('/addbits ([@\w*])*/g', async ({ message, say}) => {
+// 	const event = new bitEvent({
+//         name: 'Example Bit',
+//         bits: 1,
+//         active: true,
+//         type: 'user'
+//     });
+// 	await event.save()
+
+// 	const mentioned = text.match(/<@*?>/g);
+//     for (let i = 0; i < mentioned.length(); i++) {
+//     	mentioned[i] = mentioned[i].substring(2, mentioned[i].length() - 1);
+//     }
+
+//     mentioned.forEach(username => {
+// 		user.update({username}, {
+// 		    totalBits: newUser.totalBits + 1
+// 		    bitEvents: newUser.bitEvents.append(event)
+// 		}
+// 	}
+// 	say(`Added bits to mentioned users`);
+// });
+
+app.event('app_mention', async ({ event, context }) => {
+   try {
+    	say('You called?') 
+   }
+   catch (error) {
+       console.error(error);
+   }
+});
 
 (async () => {
   await app.start(process.env.PORT || 3000);
