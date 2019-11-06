@@ -36,7 +36,11 @@ app.message('hello', ({ message, say }) => {
 
 app.event('app_mention', async ({ event, context }) => {
    try {
-    	say('You called?') 
+    	const result = await app.client.chat.postMessage({
+	      token: context.botToken,
+	      channel: "CPT5Q10UW",
+	      text: `Welcome to the team`
+	    }); 
    }
    catch (error) {
        console.error(error);
