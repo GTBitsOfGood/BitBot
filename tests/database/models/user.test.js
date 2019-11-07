@@ -85,6 +85,15 @@ test('Should return the top 10 users.', async (done) => {
   done();
 });
 
+test('Should return all users.', async (done) => {
+  for (var i = 0; i < 10; i++) {
+    await createUser(knownEventIDs);
+  }
+  const users = await User.findAllUsersInOrder();
+  expect(users.length).toEqual(10);
+  done();
+});
+
 afterAll(async (done) => {
   // delete the old test events
   for (let eventId of knownEventIDs) {
