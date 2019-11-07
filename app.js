@@ -7,11 +7,22 @@ const app = new App({
 });
 
 app.message('hello', ({ message, say }) => {
-  // say() sends a message to the channel where the event was triggered
   say(`Hey there <@${message.user}>!`);
+});
+
+app.event('app_mention', async ({ event, context }) => {
+  try {
+    const result = await app.client.chat.postMessage({
+      token: context.botToken,
+      channel: "CPT5Q10UW",
+      text: `Welcome to the team`
+    });
+  } catch (error) {
+    console.error(error);
+  }
 });
 
 (async () => {
   await app.start(process.env.PORT || 3000);
-  console.log(' BitBot! 🎉 ');
+  console.log('BitBot! 🎉');
 })();
