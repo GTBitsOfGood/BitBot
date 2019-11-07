@@ -65,6 +65,14 @@ userSchema.statics.findUserBySlackID = async function(slackID) {
         .exec();;
 };
 
+userSchema.statics.findTop10Users = async function() {
+    return this.find().sort({totalBits: 1}).limit(10).exec();
+}
+
+userSchema.statics.findAllUsersInOrder = async function() {
+    return this.find().sort({totalBits: 1}).exec();
+}
+
 
 userSchema.methods.syncTotalBitsWithEvents = async function() {
     const eventPromises = Promise.all(this.bitEvents.map((eventID) => BitEvent.findById(eventID)));
