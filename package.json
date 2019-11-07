@@ -12,7 +12,10 @@
   "dependencies": {
     "@slack/bolt": "^1.4.1",
     "crypto": "^1.0.1",
+<<<<<<< HEAD
     "dotenv": "^8.2.0",
+=======
+>>>>>>> 1a19a8f6c0cd398a6fc3682d320fe8caf3390d49
     "eslint": "^6.6.0",
     "mongoose": "^5.7.7"
   },
