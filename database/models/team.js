@@ -12,7 +12,7 @@ const teamSchema = new Schema({
     type: ObjectId,
     ref: 'User',
     validate: {
-      validator: async (value) => User.findById(value),
+      validator: async(value) => User.findById(value),
       message: 'User does not exist in the database.'
     }
   }]

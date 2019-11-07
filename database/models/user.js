@@ -26,7 +26,7 @@ const userSchema = new Schema({
     type: ObjectId,
     ref: 'BitEvent',
     validate: {
-      validator: async (value) => BitEvent.findById(value),
+      validator: async(value) => BitEvent.findById(value),
       message: 'Bit event does not exist in the database.'
     }
   }]
@@ -63,17 +63,16 @@ userSchema.statics.findUser = async function(id) {
 userSchema.statics.findUserBySlackID = async function(slackID) {
   return this.findOne({ slackID: slackID })
     .populate('bitEvents')
-    .exec();;
+    .exec();
 };
 
 userSchema.statics.findTop10Users = async function() {
-    return this.find().sort({totalBits: 1}).limit(10).exec();
-}
+  return this.find().sort({ totalBits: 1 }).limit(10).exec();
+};
 
 userSchema.statics.findAllUsersInOrder = async function() {
-    return this.find().sort({totalBits: 1}).exec();
-}
-
+  return this.find().sort({ totalBits: 1 }).exec();
+};
 
 userSchema.methods.syncTotalBitsWithEvents = async function() {
   const eventPromises = Promise.all(this.bitEvents.map((eventID) => BitEvent.findById(eventID)));
