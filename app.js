@@ -111,7 +111,6 @@ app.event('message_deleted', async ({ event, context }) => {
             // TODO: remove bits from `event.message.ts`, the timestamp of the message that was deleted
             // TODO: maybe also DM the bits manager?
         }
-        break;
     } catch (error) {
         console.error(error);
     }
