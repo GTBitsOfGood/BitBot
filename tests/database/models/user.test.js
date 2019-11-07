@@ -13,7 +13,6 @@ async function createBitEvent() {
     name: 'Test event',
     bits: bitCount,
     active: true,
-    type: 'user'
   });
   return (await event.save()).id;
 }
