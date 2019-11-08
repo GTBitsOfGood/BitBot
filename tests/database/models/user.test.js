@@ -76,7 +76,7 @@ test('Should automatically calculate the total number of bits.', async (done) =>
 });
 
 test('Should return the top 10 users.', async (done) => {
-  for (var i = 0; i < 10; i++) {
+  for (var i = 0; i < 20; i++) { // make 20 users
     await createUser(knownEventIDs);
   }
   const users = await User.findTop10Users();
@@ -85,11 +85,8 @@ test('Should return the top 10 users.', async (done) => {
 });
 
 test('Should return all users.', async (done) => {
-  for (var i = 0; i < 10; i++) {
-    await createUser(knownEventIDs);
-  }
-  const users = await User.findAllUsersInOrder();
-  expect(users.length).toEqual(10);
+  const users = await User.findAllUsersInOrder(); // previous test made 20 users + the user made for the first tests
+  expect(users.length).toEqual(21);
   done();
 });
 
