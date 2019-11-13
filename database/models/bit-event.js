@@ -17,6 +17,7 @@ const bitEventSchema = new Schema({
   type: {
     type: String,
     enum: ['donut', 'social', 'team', 'org', 'misc'],
+    default: 'misc'
   },
   // Slack timestamp of the message that generated this bit event,
   // whether it was automatically generated from a donut date post,

@@ -1,5 +1,7 @@
+if (!global.testing) {
+    require('../config/production-environment-config')(); // if not testing, configure production environment
+}
 const { App } = require('@slack/bolt');
-require('./config'); // sets config global variable and connects to the database
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
