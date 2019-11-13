@@ -1,5 +1,6 @@
 function configureEnvironment() {
   // configures production environment (run before everything else) (sets the config environment variable)
+
   const productionEnvironmentConfig = {
     dbConnectionString: 'mongodb+srv://admin:<password>@cluster0-stgnu.gcp.mongodb.net/<db_name>?retryWrites=true&w=majority',
     dbName: 'production' /* the production DB name */

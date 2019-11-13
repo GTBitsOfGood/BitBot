@@ -1,5 +1,5 @@
 if (!global.testing) {
-    require('../config/production-environment-config')(); // if not testing, configure production environment
+    require('../config/production-environment-config')(); // if not testing, configure production environment and connects to database
 }
 const { App } = require('@slack/bolt');
 
