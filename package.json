@@ -4,7 +4,7 @@
   "description": "Bits Management System",
   "main": "index.js",
   "scripts": {
-    "start": "node js/app.js",
+    "start": "node app/app.js",
     "test": "jest ./tests --config jest.config.js"
   },
   "author": "Bits of Good",
