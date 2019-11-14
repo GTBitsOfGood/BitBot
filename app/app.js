@@ -124,6 +124,13 @@ app.command('/leaderboard', async ({ command, ack, say }) => {
   say(`${command.text}`);
 });
 
+app.command('/echo', async ({ command, ack, say }) => {
+  // Acknowledge command request
+  ack();
+
+  say(`${command.text}`);
+});
+
 async function getRealName(userId) {
   try {
     const result = await app.client.users.info({
