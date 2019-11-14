@@ -102,7 +102,7 @@ test('remove event from users test', async (done) => {
     expect(user.bitEvents.length).toEqual(2);
   }
   // remove the second event
-  await User.removeEvent(eventID);
+  await User.removeEventByID(eventID);
   for (let userID of userIDs) {
     const user = await User.findById(userID);
     expect(user.totalBits).toEqual(100);
