@@ -154,19 +154,6 @@ app.command('/echo', async ({ command, ack, say }) => {
   say(`${command.text}`);
 });
 
-async function getRealName(userId) {
-  try {
-    const result = await app.client.users.info({
-      token: context.botToken,
-      user: userId
-    });
-    console.log(result);
-    return result.user.real_name;
-  } catch (error) {
-    console.log(error);
-  }
-}
-
 (async() => {
   await app.start(process.env.PORT || 3000);
   console.log('BitBot! 🎉');
