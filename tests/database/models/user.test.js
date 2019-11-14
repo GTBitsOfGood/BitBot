@@ -90,6 +90,27 @@ test('Should return all users.', async (done) => {
   done();
 });
 
+test('remove event from users test', async (done) => {
+  const eventID = await createBitEvent();
+  const secondEvent = await createBitEvent();
+  const events = [eventID, secondEvent];
+  const totalBits = 200;
+  const userIDs = [await createUser(events), await  createUser(events)];
+  for (let userID of userIDs) {
+    const user = await User.findById(userID);
+    expect(user.totalBits).toEqual(totalBits);
+    expect(user.bitEvents.length).toEqual(2);
+  }
+  // remove the second event
+  await User.removeEvent(eventID);
+  for (let userID of userIDs) {
+    const user = await User.findById(userID);
+    expect(user.totalBits).toEqual(100);
+    expect(user.bitEvents.length).toEqual(1);
+  }
+  done();
+});
+
 afterAll(async (done) => {
   // delete the old test events
   for (let eventId of knownEventIDs) {
