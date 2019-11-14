@@ -72,13 +72,23 @@ userSchema.statics.findAllUsersInOrder = async function() {
 
 /**
  * Removes the event from the BitEvent collection and all instances of it from the users (updates the user's total bits)
- * @param eventID
+ * @param eventID - the event's id
  * @returns {Promise<int | null>} a promise that resolves to the number of documents updated
  */
-userSchema.statics.removeEvent = async function(eventID) {
+userSchema.statics.removeEventByID = async function(eventID) {
+  return await this.removeEvent({_id: eventID});
+};
+
+/**
+ * Removes the event from the BitEvent collection and all instances of it from the users (updates the user's total bits)
+ * @param eventQuery - the query for the event used to select the event to remove. will only remove the first event that matches the query
+ * @returns {Promise<int | null>} a promise that resolves to the number of documents updated
+ */
+userSchema.statics.removeEvent = async function(eventQuery) {
   let usersUpdated = null;
   try {
-    const event = await BitEvent.findByIdAndRemove(eventID).exec();
+    const event = await BitEvent.findOneAndRemove(eventQuery);
+    const eventID = event._id;
     const result = await User.updateMany(
         {
           bitEvents: {$in: [eventID]}},
