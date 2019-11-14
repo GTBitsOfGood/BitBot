@@ -117,10 +117,11 @@ app.event('message_deleted', async({ event, context }) => {
 
 // Regex to determine if this is a valid email
 // This uses a constraint object to listen for dialog submissions with a callback_id of ticket_submit
-app.action({ callback_id: 'leaderboard' }, ({ action, ack, say }) => {
-	// it’s a valid email, accept the submission
-    ack();
-    say(`Called leaderboard command`);
+app.command('/leaderboard', async ({ command, ack, say }) => {
+  // Acknowledge command request
+  ack();
+
+  say(`${command.text}`);
 });
 
 async function getRealName(userId) {
