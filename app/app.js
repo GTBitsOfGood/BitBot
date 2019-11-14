@@ -24,11 +24,6 @@ app.event('app_mention', async({ event, context }) => {
   }
 });
 
-(async() => {
-  await app.start(process.env.PORT || 3000);
-  console.log('BitBot! 🎉');
-})();
-
 const donutDateChannelId = 'C12345';
 const bitManagerIds = []; // user ids of people allowed to add bits
 const disapprovalEmojis = [];
@@ -143,3 +138,8 @@ async function getRealName(userId) {
     console.log(error);
   }
 }
+
+(async() => {
+  await app.start(process.env.PORT || 3000);
+  console.log('BitBot! 🎉');
+})();
