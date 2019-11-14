@@ -6,7 +6,11 @@ const { User, BitEvent, Team } = require('../database');
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
-  signingSecret: process.env.SLACK_SIGNING_SECRET
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+  endpoints: {
+    events: '/slack/events',
+    commands: '/slack/commands'
+  }
 });
 
 const donutDateChannelId = 'C12345'; // TODO: update this
@@ -28,11 +32,6 @@ app.event('app_mention', async({ event, context }) => {
     console.error(error);
   }
 });
-
-(async() => {
-  await app.start(process.env.PORT || 3000);
-  console.log('BitBot! 🎉');
-})();
 
 /**
  * Return mentioned users in a message as a list of user IDs.
@@ -138,3 +137,37 @@ app.event('message_changed', async({ event, context }) => {
     console.error(error);
   }
 });
+
+// Regex to determine if this is a valid email
+// This uses a constraint object to listen for dialog submissions with a callback_id of ticket_submit
+app.command('/leaderboard', async ({ command, ack, say }) => {
+  // Acknowledge command request
+  ack();
+
+  say(`${command.text}`);
+});
+
+app.command('/echo', async ({ command, ack, say }) => {
+  // Acknowledge command request
+  ack();
+
+  say(`${command.text}`);
+});
+
+async function getRealName(userId) {
+  try {
+    const result = await app.client.users.info({
+      token: context.botToken,
+      user: userId
+    });
+    console.log(result);
+    return result.user.real_name;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+(async() => {
+  await app.start(process.env.PORT || 3000);
+  console.log('BitBot! 🎉');
+})();
