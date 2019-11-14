@@ -10,8 +10,15 @@ const bitEventSchema = new Schema({
     type: Number,
     required: true,
   },
+  // Inactive bit events are ones from past semesters
   active: {
     type: Boolean,
+    required: true,
+  },
+  // Bit events may be invalid if they were automatically generated from a donut date message and then the bit manager canceled it
+  valid: {
+    type: Boolean,
+    default: true,
     required: true,
   },
   type: {

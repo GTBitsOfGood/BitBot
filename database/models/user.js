@@ -77,6 +77,7 @@ userSchema.statics.findAllUsersInOrder = async function() {
 userSchema.methods.syncTotalBitsWithEvents = async function() {
   const eventPromises = Promise.all(this.bitEvents.map((eventID) => BitEvent.findById(eventID)));
   this.totalBits = (await eventPromises)
+    .filter((bitEvent) => bitEvent.active && bitEvent.valid)
     .map((bitEvent) => bitEvent.bits)
     .reduce((a, b) => a + b);
   return this.totalBits;
