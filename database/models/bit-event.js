@@ -27,6 +27,17 @@ const bitEventSchema = new Schema({
   }
 });
 
+/**
+ * Finds bit event by associated Slack timestamp
+ * @param {String} timestamp
+ * @returns {Promise<User>} with the bitEventID's replaced with bitEvents
+ */
+bitEventSchema.statics.findEventByTs = async function(ts) {
+  return this.findOne({ ts: ts })
+    .populate('bitEvents')
+    .exec();
+};
+
 const BitEvent = mongoose.model('BitEvent', bitEventSchema);
 
 module.exports = {

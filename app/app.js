@@ -1,12 +1,17 @@
 if (!global.testing) {
-    require('../config/production-environment-config')(); // if not testing, configure production environment and connects to database
+  require('../config/production-environment-config')(); // if not testing, configure production environment
 }
 const { App } = require('@slack/bolt');
+const { User, BitEvent, Team } = require('../database');
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET
 });
+
+const donutDateChannelId = 'C12345'; // TODO: update this
+const bitManagerIds = []; // user ids of people allowed to add bits
+const disapprovalEmojis = [':x:'];
 
 app.message('hello', ({ message, say }) => {
   say(`Hey there <@${message.user}>!`);
@@ -29,19 +34,39 @@ app.event('app_mention', async({ event, context }) => {
   console.log('BitBot! 🎉');
 })();
 
-const donutDateChannelId = 'C12345';
-const bitManagerIds = []; // user ids of people allowed to add bits
-const disapprovalEmojis = [];
+/**
+ * Return mentioned users in a message as a list of user IDs.
+ *
+ * @param {String} text of a Slack message with some mentions
+ * @returns {List<String>} a list of user IDs that were mentioned
+ */
+function getMentions(text) {
+  const mentioned = text.match(/<@*?>/g);
+  for (let i = 0; i < mentioned.length(); i++) {
+    mentioned[i] = mentioned[i].substring(2, mentioned[i].length() - 1); // chop off the beginning <@ and ending >
+  }
+  return mentioned;
+}
 
 // When message posted in Donut Date Channel, add points to them.
 app.event('message.channels', async({ event, context }) => {
   try {
     if (event.channel === donutDateChannelId) {
-      const mentioned = event.text.match(/<@*?>/g);
-      for (let i = 0; i < mentioned.length(); i++) {
-        mentioned[i] = mentioned[i].substring(2, mentioned[i].length() - 1); // chop off the beginning <@ and ending >
+      let participants = getMentions(event.text);
+      participants.push(event.user);
+      let bitEvent = new BitEvent({
+        name: 'Donut date', // maybe add date?
+        bits: 2,
+        active: true,
+        type: 'donut',
+        ts: event.ts,
+      });
+      bitEvent.save();
+      for (let p of participants) {
+        let user = await User.findUserBySlackID(p);
+        user.bitEvents.push(bitEvent);
+        await user.save();
       }
-      // TODO: Add bits to those mentioned and the user who posted the message (`event.user`)
     }
   } catch (error) {
     console.error(error);
@@ -53,19 +78,19 @@ app.event('reaction_added', async({ event, context }) => {
   try {
     if (event.item.channel === donutDateChannelId && disapprovalEmojis.includes(event.reaction) && bitManagerIds.includes(event.user)) {
       const message = await app.client.channels.history({
-        token: botToken,
+        token: context.botToken,
         channel: event.item.channel,
         latest: event.item.ts,
         inclusive: true,
         count: 1
       });
-      const posterId = message.messages[0].user; // id of user who posted the message
-      const text = message.messages[0].text;
-      const mentioned = text.match(/<@*?>/g);
-      for (let i = 0; i < mentioned.length(); i++) {
-        mentioned[i] = mentioned[i].substring(2, mentioned[i].length() - 1);
-      }
-      // TODO: Remove bits from those mentioned and the user who posted the message
+      // let participants = getMentions(message.messages[0].text);
+      // participants.push(message.messages[0].user); // id of user who posted the message
+      // for (let p of participants) {
+      //   let user = await User.findUserBySlackID(p);
+      //   user.bitEvents = user.bitEvents.filter(bitEvent => bitEvent.ts !== event.ts);
+      //   await user.save();
+      // }
     }
   } catch (error) {
     console.error(error);
@@ -76,10 +101,7 @@ app.event('reaction_added', async({ event, context }) => {
 app.event('reaction_added', async({ event, context }) => {
   try {
     if (event.item.channel === donutDateChannelId && disapprovalEmojis.includes(event.reaction)) {
-      const mentioned = event.text.match(/<@*?>/g);
-      for (let i = 0; i < mentioned.length(); i++) {
-        mentioned[i] = mentioned[i].substring(2, mentioned[i].length() - 1);
-      }
+      const mentioned = getMentions(event.text);
       // TODO: Remove bits from those mentioned and the user who posted the message
     }
   } catch (error) {
@@ -115,10 +137,10 @@ app.event('message_deleted', async({ event, context }) => {
   }
 });
 
-async function getRealName(userId) {
+async function getRealName(userId, botToken) {
   try {
     const result = await app.client.users.info({
-      token: context.botToken,
+      token: botToken,
       user: userId
     });
     console.log(result);
