@@ -116,7 +116,7 @@ app.event('message_deleted', async({ event, context }) => {
 app.event('message_changed', async({ event, context }) => {
   try {
     if (event.channel === donutDateChannelId) {
-      await BitEvent.removeOne({ ts: event.message.ts });
+      await User.removeEvent({ ts: event.message.ts });
       let participants = getMentions(event.ts);
       participants.push(event.message.user);
       let bitEvent = new BitEvent({
