@@ -1,5 +1,5 @@
 if (!global.testing) {
-  require('../config/production-environment-config')(); // if not testing, configure production environment
+  require('../config/production-environment-config')(); // if not testing, configure production environment and connects to database
 }
 const { App } = require('@slack/bolt');
 const { User, BitEvent, Team } = require('../database');
@@ -72,7 +72,7 @@ app.event('message.channels', async({ event, context }) => {
   }
 });
 
-// Remove bits (by deactivating corresponding bitEvent) if message gets an X emoji from an approved user
+// Remove bits (by invalidating corresponding bitEvent) if message gets an X emoji from an approved user
 app.event('reaction_added', async({ event, context }) => {
   try {
     if (event.item.channel === donutDateChannelId && disapprovalEmojis.includes(event.reaction) && bitManagerIds.includes(event.user)) {
