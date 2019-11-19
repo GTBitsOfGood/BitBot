@@ -14,7 +14,7 @@ app.event('app_mention', async ({ event, context }) => {
   try {
     const result = await app.client.chat.postMessage({
       token: context.botToken,
-      channel: "CPT5Q10UW",
+      channel: event.item.channel,
       text: `Welcome to the team`
     });
   } catch (error) {
@@ -129,23 +129,14 @@ async function getRealName(userId) {
     }
 }
 
-app.event('app_mention', async ({ event, context }) => {
-  try {
-    if (context.match('@BitBot hey')){
-      const result = await app.client.chat.postMessage({
-        token: context.botToken,
-        channel: "CPT5Q10UW",
-        text: `Welcome to the team`
-      });
-    }
-  } catch (error) {
-    console.error(error);
-  }
-});
-
 app.event('message', async ({ event, context }) => {
   try {
-    if (context.match('addbits')){
+    const result = await app.client.chat.postMessage({
+        token: context.botToken,
+        channel: event.item.channel,
+        text: `Added Bits to user`
+      });
+    // if (context.match('addbits')){
       // const event = new bitEvent({
       //   name: 'Example Bit',
       //   bits: 1,
@@ -154,11 +145,11 @@ app.event('message', async ({ event, context }) => {
       // });
       // await event.save()
 
-      const result = await app.client.chat.postMessage({
-        token: context.botToken,
-        channel: event.item.channel,
-        text: `Added Bits to user`
-      });
+      // const result = await app.client.chat.postMessage({
+      //   token: context.botToken,
+      //   channel: event.item.channel,
+      //   text: `Added Bits to user`
+      // });
 
       // const mentioned = text.match(/<@*?>/g);
       // for (let i = 0; i < mentioned.length(); i++) {
@@ -176,7 +167,7 @@ app.event('message', async ({ event, context }) => {
       //   }
       // }
 
-    }
+    // }
   } catch (error) {
     console.error(error);
   }
