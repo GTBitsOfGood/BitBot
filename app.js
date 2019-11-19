@@ -146,35 +146,35 @@ app.event('app_mention', async ({ event, context }) => {
 app.event('message', async ({ event, context }) => {
   try {
     if (context.match('addbits')){
-      const event = new bitEvent({
-        name: 'Example Bit',
-        bits: 1,
-        active: true,
-        type: 'user'
-      });
-      await event.save()
+      // const event = new bitEvent({
+      //   name: 'Example Bit',
+      //   bits: 1,
+      //   active: true,
+      //   type: 'user'
+      // });
+      // await event.save()
 
       const result = await app.client.chat.postMessage({
         token: context.botToken,
-        channel: "CPT5Q10UW",
-        text: `Added Bits of ${event.type} type`
+        channel: event.item.channel,
+        text: `Added Bits to user`
       });
 
-      const mentioned = text.match(/<@*?>/g);
-      for (let i = 0; i < mentioned.length(); i++) {
-        mentioned[i] = mentioned[i].substring(2, mentioned[i].length() - 1);
-      }
+      // const mentioned = text.match(/<@*?>/g);
+      // for (let i = 0; i < mentioned.length(); i++) {
+      //   mentioned[i] = mentioned[i].substring(2, mentioned[i].length() - 1);
+      // }
 
-      mentioned.forEach(username => {
+      // mentioned.forEach(username => {
       
-        const user = await User.findUserBySlackID(slackID);
-        let bits = user.bitEvents
-        bits.append(event)
-        user.update({username}, {
-            totalBits: user.totalBits + 1
-            bitEvents: bits
-        }
-      }
+      //   const user = await User.findUserBySlackID(slackID);
+      //   let bits = user.bitEvents
+      //   bits.append(event)
+      //   user.update({username}, {
+      //       totalBits: user.totalBits + 1
+      //       bitEvents: bits
+      //   }
+      // }
 
     }
   } catch (error) {
