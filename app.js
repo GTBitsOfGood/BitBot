@@ -154,7 +154,13 @@ app.event('message', async ({ event, context }) => {
       });
       await event.save()
 
-        const mentioned = text.match(/<@*?>/g);
+      const result = await app.client.chat.postMessage({
+        token: context.botToken,
+        channel: "CPT5Q10UW",
+        text: `Added Bits of ${event.type} type`
+      });
+
+      const mentioned = text.match(/<@*?>/g);
       for (let i = 0; i < mentioned.length(); i++) {
         mentioned[i] = mentioned[i].substring(2, mentioned[i].length() - 1);
       }
@@ -170,12 +176,6 @@ app.event('message', async ({ event, context }) => {
         }
       }
 
-
-      const result = await app.client.chat.postMessage({
-        token: context.botToken,
-        channel: "CPT5Q10UW",
-        text: `Added Bits to ________`
-      });
     }
   } catch (error) {
     console.error(error);
