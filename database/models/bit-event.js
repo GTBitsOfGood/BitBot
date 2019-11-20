@@ -10,8 +10,15 @@ const bitEventSchema = new Schema({
     type: Number,
     required: true,
   },
+  // Inactive bit events are ones from past semesters
   active: {
     type: Boolean,
+    required: true,
+  },
+  // Bit events may be invalid if they were automatically generated from a donut date message and then the bit manager canceled it
+  valid: {
+    type: Boolean,
+    default: true,
     required: true,
   },
   type: {
@@ -26,6 +33,17 @@ const bitEventSchema = new Schema({
     type: String,
   }
 });
+
+/**
+ * Finds bit event by associated Slack timestamp
+ * @param {String} timestamp
+ * @returns {Promise<User>} with the bitEventID's replaced with bitEvents
+ */
+bitEventSchema.statics.findEventByTs = async function(ts) {
+  return this.findOne({ ts: ts })
+    .populate('bitEvents')
+    .exec();
+};
 
 const BitEvent = mongoose.model('BitEvent', bitEventSchema);
 

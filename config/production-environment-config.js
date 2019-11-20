@@ -12,7 +12,7 @@ function configureEnvironment() {
   }
   productionEnvironmentConfig.dbConnectionString = productionEnvironmentConfig.dbConnectionString.replace('<password>', process.env.BITS_DB_PASS);
 
-  const dbName = productionEnvironmentConfig.dbName
+  const dbName = productionEnvironmentConfig.dbName;
   productionEnvironmentConfig.dbConnectionString = productionEnvironmentConfig.dbConnectionString.replace('<db_name>', dbName);
 
 
