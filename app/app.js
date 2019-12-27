@@ -13,7 +13,7 @@ const app = new App({
   }
 });
 
-const donutDateChannelId = 'C12345'; // TODO: update this
+const donutDateChannelId = 'CQHDH1GP3'; // Slack IDs are formatted like app.slack.com/client/<team_id>/<channel_id>/details/…
 const bitManagerIds = []; // user ids of people allowed to add bits
 const disapprovalEmojis = [':x:'];
 
