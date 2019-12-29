@@ -2,7 +2,7 @@ if (!global.testing) {
   require('../config/production-environment-config')(); // if not testing, configure production environment and connects to database
 }
 const { App } = require('@slack/bolt');
-const { User, BitEvent, Team } = require('../database');
+const { User, BitEvent, Team } = require('../database/database');
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -13,7 +13,7 @@ const app = new App({
   }
 });
 
-const donutDateChannelId = 'CQHDH1GP3'; // Slack IDs are formatted like app.slack.com/client/<team_id>/<channel_id>/details/…
+const donutDateChannelId = 'CQHDH1GP3'; // Slack URLs are formatted like app.slack.com/client/<team_id>/<channel_id>/details/…
 const bitManagerIds = []; // user ids of people allowed to add bits
 const disapprovalEmojis = [':x:'];
 

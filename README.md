@@ -1,5 +1,21 @@
 # Bit Bot
 
+Create a project and free cluster on MongoDB Atlas.
+
+https://www.mongodb.com/blog/post/build-a-slack-app-in-10-minutes-with-mongodb-stitch
+
+Set your environment variables:
+
+```
+export BITS_DB_PASS=<your-db-password>
+export SLACK_SIGNING_SECRET=<your-signing-secret>
+export SLACK_BOT_TOKEN=<your-bot-token>
+```
+
+```
+npm run start
+```
+
 ## Code Style
 
 Basically, use semicolons, single quotes, and 2-space indents. See .eslintrc.yml and .eslintignore
