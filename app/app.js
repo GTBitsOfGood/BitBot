@@ -166,7 +166,9 @@ app.message('get users', async ({ message, context, say }) => {
     });
     // console.log(result);
     console.log(result);
-    say(`${result}`);
+    say(`${result.channel.members[0]}`);
+    say(`${result.channel.members[1]}`);
+    say(`${result.channel.members[2]}`);
   }
   catch (error) {
     console.error(error);
