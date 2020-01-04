@@ -156,7 +156,7 @@ app.command('/echo', async ({ command, ack, say }) => {
 
 //This is for testing getting list of users from a channel
 //Will maybe turn this into a command later
-app.message('get users', async ({ message, context }) => {
+app.message('get users', async ({ message, context, say }) => {
   try {
     // Call the chat.scheduleMessage method with a token
     const result = await app.client.channels.info({
@@ -164,6 +164,7 @@ app.message('get users', async ({ message, context }) => {
       token: context.botToken,
       channel: "CPT5Q10UW",
     });
+    console.log(result);
     say(`${result}`);
   }
   catch (error) {
