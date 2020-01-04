@@ -154,6 +154,23 @@ app.command('/echo', async ({ command, ack, say }) => {
   say(`${command.text}`);
 });
 
+//This is for testing getting list of users from a channel
+//Will maybe turn this into a command later
+app.message('get users', async ({ message, context }) => {
+  try {
+    // Call the chat.scheduleMessage method with a token
+    const result = await app.client.channels.info({
+      // The token you used to initialize your app is stored in the `context` object
+      token: context.botToken,
+      channel: message.channel.id,
+    });
+    say(`${result}`);
+  }
+  catch (error) {
+    console.error(error);
+  }
+});
+
 (async() => {
   await app.start(process.env.PORT || 3000);
   console.log('BitBot! 🎉');
