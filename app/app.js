@@ -162,11 +162,11 @@ app.message('get users', async ({ message, context, say }) => {
     const result = await app.client.channels.info({
       // The token you used to initialize your app is stored in the `context` object
       token: context.botToken,
-      channel: "CPT5Q10UW",
+      channel: message.channel,
     });
     // console.log(result);
-    console.log(message);
-    say(`${result.members}`);
+    console.log(result);
+    say(`${result}`);
   }
   catch (error) {
     console.error(error);
