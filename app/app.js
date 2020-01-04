@@ -164,8 +164,9 @@ app.message('get users', async ({ message, context, say }) => {
       token: context.botToken,
       channel: "CPT5Q10UW",
     });
-    console.log(result);
-    say(`${result}`);
+    // console.log(result);
+    console.log(message);
+    say(`${result.members}`);
   }
   catch (error) {
     console.error(error);
