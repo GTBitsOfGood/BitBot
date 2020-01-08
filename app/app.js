@@ -138,8 +138,6 @@ app.event('message_changed', async({ event, context }) => {
   }
 });
 
-// Regex to determine if this is a valid email
-// This uses a constraint object to listen for dialog submissions with a callback_id of ticket_submit
 app.command('/leaderboard', async ({ command, ack, say }) => {
   // Acknowledge command request
   ack();

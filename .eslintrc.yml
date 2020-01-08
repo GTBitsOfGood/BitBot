@@ -16,6 +16,11 @@ rules:
   indent:
     - warn
     - 2
+    - MemberExpression: off
+      CallExpression: off
+      FunctionExpression: off
+      FunctionDeclaration: off
+      VariableDeclarator: off
   linebreak-style:
     - off
     - unix
@@ -31,7 +36,7 @@ rules:
     - always
   object-curly-spacing:
     - warn
-    - always
+    - ignore
   array-bracket-spacing:
     - warn
     - never
