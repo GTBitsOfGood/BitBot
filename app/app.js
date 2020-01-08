@@ -16,11 +16,14 @@ const app = new App({
 const donutDateChannelId = 'CQHDH1GP3'; // Slack URLs are formatted like app.slack.com/client/<team_id>/<channel_id>/details/…
 const bitManagerIds = []; // user ids of people allowed to add bits
 const disapprovalEmojis = [':x:'];
+const donutDateBits = 2;
 
+// TODO: remove for production
 app.message('hello', ({ message, say }) => {
   say(`Hey there <@${message.user}>!`);
 });
 
+// TODO: remove for production, or have it DM help
 app.event('app_mention', async({ event, context }) => {
   try {
     const result = await app.client.chat.postMessage({
@@ -55,7 +58,7 @@ app.event('message.channels', async({ event, context }) => {
       participants.push(event.event.user);
       let bitEvent = new BitEvent({
         name: 'Donut date', // maybe add date?
-        bits: 2,
+        bits: donutDateBits,
         active: true,
         type: 'donut',
         ts: event.event.ts,
@@ -86,7 +89,7 @@ app.event('reaction_added', async({ event, context }) => {
 });
 
 // Re-add bits if X emoji removed from a message
-app.event('reaction_added', async({ event, context }) => {
+app.event('reaction_removed', async({ event, context }) => {
   try {
     if (event.item.channel === donutDateChannelId && disapprovalEmojis.includes(event.reaction)) {
       let bitEvent = await BitEvent.findEventByTs(event.item.ts);
@@ -121,7 +124,7 @@ app.event('message_changed', async({ event, context }) => {
       participants.push(event.message.user);
       let bitEvent = new BitEvent({
         name: 'Donut date',
-        bits: 2,
+        bits: donutDateBits,
         active: true,
         type: 'donut',
         ts: event.event.ts,
@@ -138,11 +141,57 @@ app.event('message_changed', async({ event, context }) => {
   }
 });
 
+/**
+ * Return a Markdown string representation of the leaderboard.
+ * 
+ * @param {Optional<int>} start 
+ * @param {Optional<int>} end 
+ * @param {Optional<String>} team 
+ * @return {String}
+ */
+function formatLeaderboard(start, end, team) {
+  let names = User.findTopUsers(start, end, team);
+  for (const i = 0; i < names.length(); i++) {
+    names[i] = `${start + i}. ${names[i]}`;
+  }
+  return names.join('\n');
+}
+
+/**
+ * Return JSON for a one-section block, to be passed into `say`.
+ * 
+ * @param {String} text
+ * @return {Object}
+ */
+function mrkdwnBlock(text) {
+  return {
+    blocks: [{
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": text
+      }
+    }]
+  }
+}
+
 app.command('/leaderboard', async ({ command, ack, say }) => {
   // Acknowledge command request
   ack();
-
-  say(`${command.text}`);
+  const args = command.text.split(" ");
+  if (args.length() === 0) {
+    say(mrkdwnBlock(formatLeaderboard));
+  } else if (Number.isInteger(args[0])) {
+    if (args.length() > 1 && Number.isInteger(args[1])) {
+      say(mrkdwnBlock(formatLeaderboard(args[0], args[1])));
+    } else {
+      say(mrkdwnBlock(formatLeaderboard(0, args[0])));
+    }
+  } else if (args[0] === 'me') {
+    // TODO
+  } else if (args[0] === 'team') {
+    // TODO
+  }
 });
 
 app.command('/echo', async ({ command, ack, say }) => {
@@ -162,7 +211,6 @@ app.message('get users', async ({ message, context, say }) => {
       token: context.botToken,
       channel: message.channel,
     });
-    // console.log(result);
     console.log(result);
     say(`${result.channel.members[0]}`);
     say(`${result.channel.members[1]}`);

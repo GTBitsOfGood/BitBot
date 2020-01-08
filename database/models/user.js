@@ -66,6 +66,19 @@ userSchema.statics.findTop10Users = async function() {
   return this.find().sort({ totalBits: 1 }).limit(10).exec();
 };
 
+/**
+ * Get a list of the names of users with the most bits. If `team` is given, only members of that
+ * team will be returned.
+ * 
+ * @param {Optional<int>} start 
+ * @param {Optional<int>} end 
+ * @param {Optional<int>} team 
+ * @return {List<String>}
+ */
+userSchema.statics.findTopUsers = async function(start, end, team) {
+  // TODO
+}
+
 userSchema.statics.findAllUsersInOrder = async function() {
   return this.find().sort({ totalBits: 1 }).exec();
 };
