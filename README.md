@@ -1,5 +1,9 @@
 # Bit Bot
 
+Bit Bot is a participation points management Slack bot created for Georgia Tech Bits of Good.
+
+## Deploy a New Instance
+
 Create a project and free cluster on MongoDB Atlas.
 
 https://www.mongodb.com/blog/post/build-a-slack-app-in-10-minutes-with-mongodb-stitch
@@ -15,6 +19,10 @@ export SLACK_BOT_TOKEN=<your-bot-token>
 ```
 npm run start
 ```
+
+Edit the Slack app commands description at your [app management dashboard](https://api.slack.com/apps), under Slash Commands.
+
+TODO: more comprehensive setup instructions
 
 ## Code Style
 

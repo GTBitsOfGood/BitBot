@@ -13,8 +13,10 @@ const app = new App({
   }
 });
 
-const donutDateChannelId = 'CQHDH1GP3'; // Slack URLs are formatted like app.slack.com/client/<team_id>/<channel_id>/details/…
-const bitManagerIds = []; // user ids of people allowed to add bits
+// TODO: make donut date channel ID configurable
+let donutDateChannelId = 'CQHDH1GP3'; // Slack URLs are formatted like app.slack.com/client/<team_id>/<channel_id>/details/…
+// TODO: make bit manager IDs configurable
+let bitManagerIds = []; // user ids of people allowed to add bits
 const disapprovalEmojis = [':x:'];
 const donutDateBits = 2;
 
@@ -142,22 +144,6 @@ app.event('message_changed', async({ event, context }) => {
 });
 
 /**
- * Return a Markdown string representation of the leaderboard.
- * 
- * @param {Optional<int>} start 
- * @param {Optional<int>} end 
- * @param {Optional<String>} team 
- * @return {String}
- */
-function formatLeaderboard(start, end, team) {
-  let names = User.findTopUsers(start, end, team);
-  for (const i = 0; i < names.length(); i++) {
-    names[i] = `${start + i}. ${names[i]}`;
-  }
-  return names.join('\n');
-}
-
-/**
  * Return JSON for a one-section block, to be passed into `say`.
  * 
  * @param {String} text
@@ -175,34 +161,51 @@ function mrkdwnBlock(text) {
   }
 }
 
+/**
+ * Return JSON for a leaderboard, to be passed into `say`.
+ * 
+ * @param {Optional<int>} offset 
+ * @param {Optional<int>} limit 
+ * @param {Optional<String>} team 
+ * @return {Object}
+ */
+async function leaderboardBlock(offset, limit, team) {
+  return await mrkdwnBlock(User.leaderboard(offset, limit, team));
+}
+
+/**
+ * Command formats:
+ * /leaderboard: list top 10 users (users with the most bits)
+ * /leaderboard <offset: int>: list top users, starting from the given offset
+ * /leaderboard <offset: int> <limit: int>: list top users, starting from the given offset, with the number of returned users according to the given limit
+ * /leaderboard me: show the position of the user relative to surrounding people
+ * /leaderboard team: show top users in the team
+ */
 app.command('/leaderboard', async ({ command, ack, say }) => {
-  // Acknowledge command request
   ack();
   const args = command.text.split(" ");
   if (args.length() === 0) {
-    say(mrkdwnBlock(formatLeaderboard));
+    say(await leaderboardBlock());
   } else if (Number.isInteger(args[0])) {
     if (args.length() > 1 && Number.isInteger(args[1])) {
-      say(mrkdwnBlock(formatLeaderboard(args[0], args[1])));
+      say(await leaderboardBlock(args[0], args[1]));
     } else {
-      say(mrkdwnBlock(formatLeaderboard(0, args[0])));
+      say(await leaderboardBlock(0, args[0]));
     }
   } else if (args[0] === 'me') {
-    // TODO
+    say(await mrkdwnBlock(User.leaderboardMe(command.user_id)));
   } else if (args[0] === 'team') {
-    // TODO
+    say(await leaderboardBlock(null, null, command.user_id, true));
   }
 });
 
 app.command('/echo', async ({ command, ack, say }) => {
-  // Acknowledge command request
   ack();
-
   say(`${command.text}`);
 });
 
-//This is for testing getting list of users from a channel
-//Will maybe turn this into a command later
+// This is for testing getting list of users from a channel
+// TODO: consider turning into a command later
 app.message('get users', async ({ message, context, say }) => {
   try {
     // Call the chat.scheduleMessage method with a token

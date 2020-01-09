@@ -34,6 +34,7 @@ const userSchema = new Schema({
     }
   }]
 });
+
 /**
  * Finds user by Mongo id
  * @param id - Mongo ID
@@ -62,20 +63,68 @@ userSchema.statics.findUserBySlackID = async function(slackID) {
       .exec();
 };
 
+userSchema.statics.findTeam = async function(userSlackID) {
+  // TODO
+}
+
 userSchema.statics.findTop10Users = async function() {
   return this.find().sort({ totalBits: 1 }).limit(10).exec();
 };
 
 /**
- * Get a list of the names of users with the most bits. If `team` is given, only members of that
- * team will be returned.
+ * List users with the most bits (populated with the 'name' and 'totalBits' fields).
+ * If `team` is given, only members of the team of the given userID will be returned.
  * 
- * @param {Optional<int>} start 
- * @param {Optional<int>} end 
- * @param {Optional<int>} team 
- * @return {List<String>}
+ * @param {Optional<int>} offset 
+ * @param {Optional<int>} limit 
+ * @param {Optional<String>} userSlackID
+ * @param {Optional<boolean>} getTeam 
+ * @returns {Promise<List<User>>}
  */
-userSchema.statics.findTopUsers = async function(start, end, team) {
+userSchema.statics.findTopUsers = async function(offset, limit, userSlackID, getTeam) {
+  let team = User.findTeam(userSlackID);
+  // TODO: resolve circular dependency between User and Team
+  let query = team && getTeam ? Team.find({ name: team }).members.populate('User', 'name totalBits')
+                              : this.find({}, { name: 1, totalBits: 1 });
+  query = query.sort({ totalBits: 1 });
+  if (offset)
+    query = query.skip(offset);
+  if (limit)
+    query = query.limit(limit);
+  return users = await query.exec();
+}
+
+userSchema.statics.findTopUsersAroundMe = async function(userSlackID) {
+  // TODO
+}
+
+/**
+ * Return a Markdown string representation of the leaderboard.
+ * If `team` is given, only members of the team of the given userID will be returned.
+ * 
+ * @param {Optional<int>} offset 
+ * @param {Optional<int>} limit 
+ * @param {Optional<String>} userSlackID
+ * @param {Optional<boolean>} getTeam 
+ * @returns {Promise<String>}
+ */
+userSchema.statics.leaderboard = async function(offset, limit, userSlackID, getTeam) {
+  if (!offset) offset = 0;
+  // TODO: if the user is not part of a team, but getTeam is true, then it will say "top boggers in your team" instead of "top boggers"
+  const header = getTeam ? "Top boggers in your team:\n" : "Top boggers:\n";
+  let users = await userSchema.statics.findTopUsers(offset, limit, userSlackID, getTeam);
+  let lines = [];
+  for (const i = 0; i < users.length(); i++) {
+    lines += `${offset + i}. ${users[i].name}: ${users[i].totalBits} bits`;
+  }
+  return header + lines.join('\n');
+}
+
+/**
+ * @param {String} userSlackID
+ * @returns {Promise<String>}
+ */
+userSchema.statics.leaderboardMe = async function(userSlackID) {
   // TODO
 }
 
@@ -115,8 +164,6 @@ userSchema.statics.removeEvent = async function(eventQuery) {
   }
   return usersUpdated;
 };
-
-
 
 // called after validation
 userSchema.pre('save', async function(next) {
