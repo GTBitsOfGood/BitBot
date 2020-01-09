@@ -22,19 +22,18 @@ npm run start
 
 Edit the Slack app commands description at your [app management dashboard](https://api.slack.com/apps), under Slash Commands. For the request URL, enter "https://<your-heroku-deployment>.herokuapp.com/slack/commands". Here are the commands for the bot, along with suggested parameter hints and descriptions:
 
-- /leaderboard [offset] [limit]: Leaderboard of people with the most bits
-- /leaderboard_me: Know your rank and who you gotta beat
-- /leaderboard_team: Leaderboard of your team
-- /get_bits
-- /get_history
-- /y_team_bits
-- /y_add_team_member
-- /y_remove_team_member
-- /z_give_bits bits_num event_name @user…: Bit manager command
-- /z_cache_all
-- /z_add_bit_manager
-- /z_remove_bit_manager
-- /z_add_team_lead
+- /leaderboard me|team|all (offset) (limit): Leaderboard of people with the most bits. Private to you.
+- /leaderboard! me|team|all (offset) (limit): Publicly posts the leaderboard.
+- /bits: Get your bit total and categories. Private to you.
+- /history: Get a history of your bit events. Private to you.
+- /team_meeting @user…: (EM command) Mark people as present for a team meeting and add bits to them
+- /team_add @user…: (EM command) Add someone to your team
+- /team_remove @user…: (EM command) Remove someone from your team
+- /sudo_give [# of bits] [event name] @user…: (Bit manager command)
+- /sudo_cache
+- /sudo_add_bit_manager
+- /sudo_remove_bit_manager
+- /sudo_add_team_lead
 
 TODO: more comprehensive setup instructions
 

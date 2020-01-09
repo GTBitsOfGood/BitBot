@@ -25,6 +25,7 @@ const userSchema = new Schema({
   totalBitsLastSynced: {
     type: Date
   },
+  
   bitEvents: [{
     type: ObjectId,
     ref: 'BitEvent',

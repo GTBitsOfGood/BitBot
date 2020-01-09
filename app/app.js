@@ -197,6 +197,8 @@ async function leaderboardBlock(offset, limit, team) {
  * /leaderboard: list top 10 users (users with the most bits)
  * /leaderboard <offset: int>: list top users, starting from the given offset
  * /leaderboard <offset: int> <limit: int>: list top users, starting from the given offset, with the number of returned users according to the given limit
+ * /leaderboard me
+ * /leaderboard team
  */
 app.command('/leaderboard', async ({ command, ack, say }) => {
   ack();
@@ -211,22 +213,28 @@ app.command('/leaderboard', async ({ command, ack, say }) => {
     } else {
       say(await leaderboardBlock(0, args[0]));
     }
+  } else if (args[0].toLowerCase() === 'me') {
+    say(await mrkdwnBlock(User.leaderboardMe(command.user_id)));
+  } else if (args[0].toLowerCase() === 'team') {
+    say(await leaderboardBlock(null, null, command.user_id, true));
+  } else {
+    say(await leaderboardBlock());
   }
-});
-
-app.command('/leaderboard_me', async ({ command, ack, say }) => {
-  ack();
-  say(await mrkdwnBlock(User.leaderboardMe(command.user_id)));
-});
-
-app.command('/leaderboard_team', async ({ command, ack, say }) => {
-  ack();
-  say(await leaderboardBlock(null, null, command.user_id, true));
 });
 
 app.command('/echo', async ({ command, ack, say }) => {
   ack();
   say(`${command.text}`);
+});
+
+app.command('/bits', async ({ command, ack, say }) => {
+  ack();
+  // TODO
+});
+
+app.command('/history', async ({ command, ack, say }) => {
+  ack();
+  // TODO
 });
 
 // This is for testing getting list of users from a channel
