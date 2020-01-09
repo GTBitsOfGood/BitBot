@@ -147,7 +147,7 @@ app.event('message_changed', async({ event, context }) => {
  * Return JSON for a one-section block, to be passed into `say`.
  * 
  * @param {String} text
- * @return {Object}
+ * @returns {Object}
  */
 function mrkdwnBlock(text) {
   return {
@@ -158,6 +158,25 @@ function mrkdwnBlock(text) {
         "text": text
       }
     }]
+  }
+}
+
+/**
+ * Return JSON for ephemeral help.
+ * 
+ * @param {String} commandName 
+ * @param {String} helpText 
+ * @returns {Object}
+ */
+function ephemeralHelp(commandName, helpText) {
+  return {
+    "response_type": "ephemeral",
+    "text": `How to use ${commandName}`,
+    "attachments": [
+      {
+        "text": helpText
+      }
+    ]
   }
 }
 
@@ -178,25 +197,31 @@ async function leaderboardBlock(offset, limit, team) {
  * /leaderboard: list top 10 users (users with the most bits)
  * /leaderboard <offset: int>: list top users, starting from the given offset
  * /leaderboard <offset: int> <limit: int>: list top users, starting from the given offset, with the number of returned users according to the given limit
- * /leaderboard me: show the position of the user relative to surrounding people
- * /leaderboard team: show top users in the team
  */
 app.command('/leaderboard', async ({ command, ack, say }) => {
   ack();
   const args = command.text.split(" ");
   if (args.length === 0) {
     say(await leaderboardBlock());
+  } else if (args.includes('help')) {
+    say(ephemeralHelp('/leaderboard', '/leaderboard [offset: Optional<int>] [limit: Optional<int>] - Get a leaderboard of Bits of Good members with the most bits for this semester.'))
   } else if (Number.isInteger(args[0])) {
     if (args.length > 1 && Number.isInteger(args[1])) {
       say(await leaderboardBlock(args[0], args[1]));
     } else {
       say(await leaderboardBlock(0, args[0]));
     }
-  } else if (args[0] === 'me') {
-    say(await mrkdwnBlock(User.leaderboardMe(command.user_id)));
-  } else if (args[0] === 'team') {
-    say(await leaderboardBlock(null, null, command.user_id, true));
   }
+});
+
+app.command('/leaderboard_me', async ({ command, ack, say }) => {
+  ack();
+  say(await mrkdwnBlock(User.leaderboardMe(command.user_id)));
+});
+
+app.command('/leaderboard_team', async ({ command, ack, say }) => {
+  ack();
+  say(await leaderboardBlock(null, null, command.user_id, true));
 });
 
 app.command('/echo', async ({ command, ack, say }) => {

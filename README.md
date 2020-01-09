@@ -20,7 +20,21 @@ export SLACK_BOT_TOKEN=<your-bot-token>
 npm run start
 ```
 
-Edit the Slack app commands description at your [app management dashboard](https://api.slack.com/apps), under Slash Commands. For the request URL, enter "https://<your-heroku-deployment>.herokuapp.com/slack/commands".
+Edit the Slack app commands description at your [app management dashboard](https://api.slack.com/apps), under Slash Commands. For the request URL, enter "https://<your-heroku-deployment>.herokuapp.com/slack/commands". Here are the commands for the bot, along with suggested parameter hints and descriptions:
+
+- /leaderboard [offset] [limit]: Leaderboard of people with the most bits
+- /leaderboard_me: Know your rank and who you gotta beat
+- /leaderboard_team: Leaderboard of your team
+- /get_bits
+- /get_history
+- /y_team_bits
+- /y_add_team_member
+- /y_remove_team_member
+- /z_give_bits bits_num event_name @user…: Bit manager command
+- /z_cache_all
+- /z_add_bit_manager
+- /z_remove_bit_manager
+- /z_add_team_lead
 
 TODO: more comprehensive setup instructions
 
