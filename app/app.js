@@ -46,8 +46,8 @@ app.event('app_mention', async({ event, context }) => {
  */
 function getMentions(text) {
   const mentioned = text.match(/<@*?>/g);
-  for (let i = 0; i < mentioned.length(); i++) {
-    mentioned[i] = mentioned[i].substring(2, mentioned[i].length() - 1); // chop off the beginning <@ and ending >
+  for (let i = 0; i < mentioned.length; i++) {
+    mentioned[i] = mentioned[i].substring(2, mentioned[i].length - 1); // chop off the beginning <@ and ending >
   }
   return mentioned;
 }
@@ -184,10 +184,10 @@ async function leaderboardBlock(offset, limit, team) {
 app.command('/leaderboard', async ({ command, ack, say }) => {
   ack();
   const args = command.text.split(" ");
-  if (args.length() === 0) {
+  if (args.length === 0) {
     say(await leaderboardBlock());
   } else if (Number.isInteger(args[0])) {
-    if (args.length() > 1 && Number.isInteger(args[1])) {
+    if (args.length > 1 && Number.isInteger(args[1])) {
       say(await leaderboardBlock(args[0], args[1]));
     } else {
       say(await leaderboardBlock(0, args[0]));

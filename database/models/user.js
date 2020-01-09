@@ -114,7 +114,7 @@ userSchema.statics.leaderboard = async function(offset, limit, userSlackID, getT
   const header = getTeam ? "Top boggers in your team:\n" : "Top boggers:\n";
   let users = await userSchema.statics.findTopUsers(offset, limit, userSlackID, getTeam);
   let lines = [];
-  for (const i = 0; i < users.length(); i++) {
+  for (const i = 0; i < users.length; i++) {
     lines += `${offset + i}. ${users[i].name}: ${users[i].totalBits} bits`;
   }
   return header + lines.join('\n');

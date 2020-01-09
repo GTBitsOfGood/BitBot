@@ -20,7 +20,7 @@ export SLACK_BOT_TOKEN=<your-bot-token>
 npm run start
 ```
 
-Edit the Slack app commands description at your [app management dashboard](https://api.slack.com/apps), under Slash Commands.
+Edit the Slack app commands description at your [app management dashboard](https://api.slack.com/apps), under Slash Commands. For the request URL, enter "https://<your-heroku-deployment>.herokuapp.com/slack/commands".
 
 TODO: more comprehensive setup instructions
 
