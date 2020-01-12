@@ -87,7 +87,7 @@ userSchema.statics.findUserBySlackID = async function(slackID) {
  * @param slackID - the user's slackID
  * @param email - the user's email
  * @param name - the user's name
- * @returns {Promise<User>} - the existing user or new user
+ * @returns {Promise<User>} - the existing user or, if the user does not already exist, the new user
  */
 userSchema.statics.findOrCreateUser = async function(slackID, email, name) {
   let user = await this.findUserBySlackID(slackID);
