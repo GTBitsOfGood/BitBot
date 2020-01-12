@@ -41,7 +41,7 @@ const userSchema = new Schema({
  * @param id - Mongo ID
  * @returns {Promise<User>} with the bitEventID's replaced with bitEvents
  */
-userSchema.statics.findUser = async function(id) {
+userSchema.statics.findUserByMongoID = async function(id) {
   let output;
   if (mongoose.Types.ObjectId.isValid(id)) {
     output = this.findOne({ _id: id })
@@ -51,6 +51,24 @@ userSchema.statics.findUser = async function(id) {
     output = null;
   }
   return output;
+};
+
+/**
+ * Creates and returns a User
+ * @param slackID
+ * @param email
+ * @param name
+ * @returns {Promise<User>} the new user
+ */
+userSchema.statics.createUser = async function(slackID, email, name) {
+  const newUser = new User({
+    slackID,
+    email,
+    name
+  });
+  return newUser.save().then((newUser) => {
+    return newUser;
+  });
 };
 
 /**
@@ -64,9 +82,25 @@ userSchema.statics.findUserBySlackID = async function(slackID) {
       .exec();
 };
 
+/**
+ * Finds and returns a user if it exists or create ones if it does not exist
+ * @param slackID - the user's slackID
+ * @param email - the user's email
+ * @param name - the user's name
+ * @returns {Promise<User>} - the existing user or new user
+ */
+userSchema.statics.findOrCreateUser = async function(slackID, email, name) {
+  let user = await this.findUserBySlackID(slackID);
+  if (user == null) {
+    user = await this.createUser(slackID, email,  name);
+  }
+  return user;
+
+};
+
 userSchema.statics.findTeam = async function(userSlackID) {
   // TODO
-}
+};
 
 userSchema.statics.findTop10Users = async function() {
   return this.find().sort({ totalBits: 1 }).limit(10).exec();
@@ -202,7 +236,7 @@ userSchema.methods.syncTotalBitsWithEvents = async function() {
   this.totalBits = (await eventPromises)
     .filter((bitEvent) => bitEvent.active && bitEvent.valid)
     .map((bitEvent) => bitEvent.bits)
-    .reduce((a, b) => a + b);
+    .reduce((a, b) => a + b, 0);
   this.totalBitsLastSynced = Date.now();
   return this.totalBits;
 };
