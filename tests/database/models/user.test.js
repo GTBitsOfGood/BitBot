@@ -45,12 +45,12 @@ test('Should have created a test user.', () => {
 });
 
 test('Should not be able to find an unknown user.', async (done) => {
-  expect(await User.findUser('NOID')).toBeFalsy();
+  expect(await User.findUserByMongoID('NOID')).toBeFalsy();
   done();
 });
 
 test('Should find a user and populate events.', async (done) => {
-  const user = await User.findUser(userID);
+  const user = await User.findUserByMongoID(userID);
   expect(user).toBeTruthy();
   expect(user.bitEvents.length).toBe(knownEventIDs.length);
   const usersBitsAccordingToEvents = user.bitEvents.map((bitEvent) => bitEvent.bits).reduce((a, b) => a + b);
@@ -70,7 +70,7 @@ test('Should find a user by slack ID and populate events.', async (done) => {
 });
 
 test('Should automatically calculate the total number of bits.', async (done) => {
-  const user = await User.findUser(userID);
+  const user = await User.findUserByMongoID(userID);
   expect(user.totalBits).toEqual(totalBits);
   done();
 });
@@ -108,6 +108,26 @@ test('remove event from users test', async (done) => {
     expect(user.totalBits).toEqual(100);
     expect(user.bitEvents.length).toEqual(1);
   }
+  done();
+});
+
+test('create new user test', async (done) => {
+  await User.createUser('1', 'test@email.com', 'John Doe');
+  expect((await User.findUserBySlackID('1'))).toBeTruthy();
+  done();
+});
+
+test('find (and create) nonexistant user)', async (done) => {
+  const user = await User.findOrCreateUser('2', 'test1@gmail.com', 'John Doe');
+  expect(user).toBeTruthy();
+  expect(user.email).toEqual('test1@gmail.com');
+  expect((await User.findUserBySlackID('2'))).toBeTruthy();
+  done();
+});
+
+test('find existing user', async (done) => {
+  const user = await User.findOrCreateUser(slackID, 'test1@gmail.com', 'John Doe');
+  expect(user).toBeTruthy();
   done();
 });
 
