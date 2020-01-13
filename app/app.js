@@ -19,19 +19,15 @@ let donutDateChannelId = 'CQHDH1GP3'; // Slack URLs are formatted like app.slack
 let bitManagerIds = []; // user ids of people allowed to add bits
 const disapprovalEmojis = [':x:'];
 const donutDateBits = 2;
+const donutTriggers = ['donut date', 'doughnut date', 'coffee date']
 
-// TODO: remove for production
-app.message('hello', ({ message, say }) => {
-  say(`Hey there <@${message.user}>!`);
-});
 
-// TODO: remove for production, or have it DM help
 app.event('app_mention', async({ event, context }) => {
   try {
-    const result = await app.client.chat.postMessage({
+    await app.client.chat.postEphemeral({
       token: context.botToken,
-      channel: 'CPT5Q10UW',
-      text: 'Welcome to the team'
+      channel: event.event.channel,
+      text: 'TODO' // TODO: replace with help text
     });
   } catch (error) {
     console.error(error);
@@ -41,36 +37,29 @@ app.event('app_mention', async({ event, context }) => {
 /**
  * Return mentioned users in a message as a list of user IDs.
  *
- * @param {String} text of a Slack message with some mentions
+ * @param {String|Array<String>} text of a Slack message with some mentions, or an array consisting only of mentions
  * @returns {Array<String>} a list of user IDs that were mentioned
  */
 function getMentions(text) {
-  const mentioned = text.match(/<@*?>/g);
+  const mentioned = Array.isArray(text) ? text : text.match(/<@*?>/g);
   for (let i = 0; i < mentioned.length; i++) {
-    mentioned[i] = mentioned[i].substring(2, mentioned[i].length - 1); // chop off the beginning <@ and ending >
+    const pipe = mentioned[i].indexOf('|');
+    if (pipe === -1) {
+      mentioned[i] = mentioned[i].substring(2, mentioned[i].length - 1); // e.g., <@U012ABCDEF> → U012ABCDEF
+    } else {
+      mentioned[i] = mentioned[i].substring(2, pipe - 1); // e.g., <@U012ABCDEF|worf> → U012ABCDEF
+    }
   }
   return mentioned;
 }
 
-// When message posted in Donut Date Channel, add points to them.
+// When message posted in #gt-bits, add points to them under certain conditions.
 app.event('message.channels', async({ event, context }) => {
   try {
-    if (event.event.channel === donutDateChannelId) {
+    if (event.event.channel === donutDateChannelId && donutTriggers.some(trigger => event.event.text.lowercase().includes(trigger))) {
       let participants = getMentions(event.event.text);
       participants.push(event.event.user);
-      let bitEvent = new BitEvent({
-        name: 'Donut date', // maybe add date?
-        bits: donutDateBits,
-        active: true,
-        type: 'donut',
-        ts: event.event.ts,
-      });
-      bitEvent.save();
-      for (let p of participants) {
-        let user = await User.findUserBySlackID(p);
-        user.bitEvents.push(bitEvent);
-        await user.save();
-      }
+      User.addBitEvent(donutDateBits, participants, event.event.ts, 'donut', 'Donut date');
     }
   } catch (error) {
     console.error(error);
@@ -122,20 +111,10 @@ app.event('message_changed', async({ event, context }) => {
   try {
     if (event.channel === donutDateChannelId) {
       await User.removeEvent({ ts: event.message.ts });
-      let participants = getMentions(event.ts);
-      participants.push(event.message.user);
-      let bitEvent = new BitEvent({
-        name: 'Donut date',
-        bits: donutDateBits,
-        active: true,
-        type: 'donut',
-        ts: event.event.ts,
-      });
-      bitEvent.save();
-      for (let p of participants) {
-        let user = await User.findUserBySlackID(p);
-        user.bitEvents.push(bitEvent);
-        await user.save();
+      if (donutTriggers.some(trigger => event.event.text.lowercase().includes(trigger))) {
+        let participants = getMentions(event.ts);
+        participants.push(event.message.user);
+        User.addBitEvent(donutDateBits, participants, event.event.ts, 'donut', 'Donut date');
       }
     }
   } catch (error) {
@@ -214,7 +193,7 @@ app.command('/leaderboard', async ({ command, ack, say }) => {
       say(await leaderboardBlock(0, args[0]));
     }
   } else if (args[0].toLowerCase() === 'me') {
-    say(await mrkdwnBlock(User.leaderboardMe(command.user_id)));
+    say(mrkdwnBlock(await User.leaderboardMe(command.user_id)));
   } else if (args[0].toLowerCase() === 'team') {
     say(await leaderboardBlock(null, null, command.user_id, true));
   } else {
@@ -236,6 +215,71 @@ app.command('/history', async ({ command, ack, say }) => {
   ack();
   // TODO
 });
+
+app.command('/team_meeting', async ({ command, ack, say }) => {
+  ack();
+  // TODO
+});
+
+app.command('/team_add', async ({ command, ack, say }) => {
+  ack();
+  // TODO
+});
+
+app.command('/team_remove', async ({ command, ack, say }) => {
+  ack();
+  // TODO
+});
+
+/**
+ * /sudo_give [# of bits] (event name) (event type) @user…: (Bit manager command)
+ */
+app.command('/sudo_give', async ({ command, ack, say }) => {
+  ack();
+  const args = command.text.split(" ");
+  if (args.length < 2 || !Number.isInteger(args[0])) {
+    say(ephemeralHelp('/sudo_give', '/sudo_give [# of bits] (event name) (event type) @user…: (Bit manager command)'))
+  }
+  let bits = args[0];
+  let users = getMentions(command.text);
+  let event_name, event_type = '';
+  for (let i = 1; i < args.length && i < 3; i++) {
+    if (args[i].substr(0, 2) !== '<@' || args[i][args[i].length] !== '>') {
+      if (i === 1) {
+        event_name = args[i];
+      } else if (i === 2) {
+        event_type = args[i];
+      }
+    }
+  }
+  User.addBitEvent(bits, users, null, event_type, event_name);
+});
+
+app.command('/sudo_cache', async ({ command, ack, say }) => {
+  ack();
+  // TODO
+});
+
+app.command('/sudo_add_bit_manager', async ({ command, ack, say }) => {
+  ack();
+  // TODO
+});
+
+app.command('/sudo_remove_bit_manager', async ({ command, ack, say }) => {
+  ack();
+  // TODO
+});
+
+app.command('/sudo_add_team_lead', async ({ command, ack, say }) => {
+  ack();
+  // TODO
+});
+
+app.command('/sudo_teams', async ({ command, ack, say }) => {
+  ack();
+  // TODO
+});
+
 
 // This is for testing getting list of users from a channel
 // TODO: consider turning into a command later

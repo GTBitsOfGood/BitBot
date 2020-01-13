@@ -117,7 +117,7 @@ test('create new user test', async (done) => {
   done();
 });
 
-test('find (and create) nonexistant user)', async (done) => {
+test('find (and create) nonexistent user)', async (done) => {
   const user = await User.findOrCreateUser('2', 'test1@gmail.com', 'John Doe');
   expect(user).toBeTruthy();
   expect(user.email).toEqual('test1@gmail.com');

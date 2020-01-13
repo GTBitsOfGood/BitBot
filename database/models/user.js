@@ -145,13 +145,22 @@ userSchema.statics.findTopUsers = async function(offset, limit, userSlackID, get
   return users = await query.exec();
 }
 
+/**
+ * Return the user directly above the given user in terms of points, the given user,
+ * and the user directly below.
+ * 
+ * @param {string} userSlackID
+ * @returns {Promise<Array<User>>} - an array of length three, where the first element
+ * is the user above, the second is the user, and the third is the given user…
+ * TODO
+ */
 userSchema.statics.findTopUsersAroundMe = async function(userSlackID) {
   // TODO
 }
 
 /**
  * Return a Markdown string representation of the leaderboard.
- * If `team` is given, only members of the team of the given userID will be returned.
+ * If `getTeam` is true, only members of the team of the given userID will be returned.
  * 
  * @param {int} [offset] 
  * @param {int} [limit] 
@@ -216,9 +225,36 @@ userSchema.statics.changeTeam = async function(slackID, teamName) {
     return Promise.reject('Failed to remove user from old team')
   }
 
-  user.save();
-  newTeam.save();
+  await user.save();
+  await newTeam.save();
   // old team already saved
+};
+
+/**
+ * Creates a new event and adds bits to users.
+ * 
+ * @param {int} bits - number of bits to add to each user
+ * @param {Array<string>} - list of Slack user IDs to add bits to
+ * @param {string} [ts] - Slack timestamp
+ * @param {string} [type] - event type; 'donut', 'social', 'team', 'org', or 'misc' ('misc' by default)
+ * @param {string} eventName
+ */
+userSchema.statics.addBitEvent = async function(bits, userSlackIDs, ts, type, eventName) {
+  if (!['donut', 'social', 'team', 'org', 'misc'].includes(type)) {
+    type = 'misc'
+  }
+  let bitEvent = new BitEvent({
+    name: eventName,
+    bits,
+    active: true,
+    valid: true,
+    type,
+    ts
+  });
+  bitEvent.save();
+  for (let slackID of userSlackIDs) {
+    this.updateOne({ slackID }, { $push: { bitEvents: bitEvent }});
+  }
 };
 
 /**
