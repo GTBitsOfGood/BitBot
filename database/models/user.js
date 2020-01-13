@@ -18,6 +18,22 @@ const userSchema = new Schema({
     type: String,
     required: true
   },
+  bitManager: {
+    type: Boolean,
+    default: false
+  },
+  engineeringManager: {
+    type: Boolean,
+    default: false
+  },
+  team: {
+    type: ObjectId,
+    ref: 'Team',
+    validate: {
+      validator: async(value) => Team.findById(value),
+      message: 'Team does not exist in the database.'
+    }
+  },
   totalBits: {
     type: Number,
     default: 0
@@ -25,7 +41,7 @@ const userSchema = new Schema({
   totalBitsLastSynced: {
     type: Date
   },
-  
+
   bitEvents: [{
     type: ObjectId,
     ref: 'BitEvent',
@@ -54,8 +70,8 @@ userSchema.statics.findUser = async function(id) {
 };
 
 /**
- * Finds users by slackID
- * @param slackID
+ * Finds users by Slack ID
+ * @param {string} slackID - Slack user ID
  * @returns {Promise<User>} with the bitEventID's replaced with bitEvents
  */
 userSchema.statics.findUserBySlackID = async function(slackID) {
@@ -76,11 +92,11 @@ userSchema.statics.findTop10Users = async function() {
  * List users with the most bits (populated with the 'name' and 'totalBits' fields).
  * If `team` is given, only members of the team of the given userID will be returned.
  * 
- * @param {Optional<int>} offset 
- * @param {Optional<int>} limit 
- * @param {Optional<String>} userSlackID
- * @param {Optional<boolean>} getTeam 
- * @returns {Promise<List<User>>}
+ * @param {int} [offset] 
+ * @param {int} [limit] 
+ * @param {string} [userSlackID]
+ * @param {boolean} [getTeam=False] - whether to return a leaderboard for just team members or all BoG members
+ * @returns {Promise<Array<User>>}
  */
 userSchema.statics.findTopUsers = async function(offset, limit, userSlackID, getTeam) {
   let team = User.findTeam(userSlackID);
@@ -103,11 +119,11 @@ userSchema.statics.findTopUsersAroundMe = async function(userSlackID) {
  * Return a Markdown string representation of the leaderboard.
  * If `team` is given, only members of the team of the given userID will be returned.
  * 
- * @param {Optional<int>} offset 
- * @param {Optional<int>} limit 
- * @param {Optional<String>} userSlackID
- * @param {Optional<boolean>} getTeam 
- * @returns {Promise<String>}
+ * @param {int} [offset] 
+ * @param {int} [limit] 
+ * @param {string} [userSlackID]
+ * @param {boolean} [getTeam=False] - whether to return a leaderboard for just team members or all BoG members
+ * @returns {Promise<string>}
  */
 userSchema.statics.leaderboard = async function(offset, limit, userSlackID, getTeam) {
   if (!offset) offset = 0;
@@ -116,14 +132,14 @@ userSchema.statics.leaderboard = async function(offset, limit, userSlackID, getT
   let users = await userSchema.statics.findTopUsers(offset, limit, userSlackID, getTeam);
   let lines = [];
   for (const i = 0; i < users.length; i++) {
-    lines += `${offset + i}. ${users[i].name}: ${users[i].totalBits} bits`;
+    lines.push(`${offset + i}. ${users[i].name}: ${users[i].totalBits} bits`);
   }
   return header + lines.join('\n');
 }
 
 /**
- * @param {String} userSlackID
- * @returns {Promise<String>}
+ * @param {string} userSlackID
+ * @returns {Promise<string>}
  */
 userSchema.statics.leaderboardMe = async function(userSlackID) {
   // TODO
@@ -134,9 +150,47 @@ userSchema.statics.findAllUsersInOrder = async function() {
 };
 
 /**
+ * Change the team that a user belongs to. By default, fails if the team does not exist.
+ * 
+ * @param {string} slackID - Slack user ID
+ * @param {string} teamName
+ */
+userSchema.statics.changeTeam = async function(slackID, teamName) {
+  const user, oldTeamID, newTeam;
+  try {
+    user = await User.findOne({ slackID: slackID }).exec();
+    oldTeamID = user.team;
+  } catch (err) {
+    return Promise.reject('User Slack ID not found ' + err);
+  }
+  
+  try {
+    newTeam = await Team.findOne({ name: teamName }).exec();
+    user.team = team;
+    if (newTeam.members.includes(user._id)) {
+      return Promise.reject('User is already on that team ' + err);
+    } else {
+      newTeam.members.push(user._id);
+    }
+  } catch (err) {
+    return Promise.reject('Team name not found ' + err);
+  }
+
+  try {
+    Team.updateOne({ _id: oldTeamID }, { $pull: { members: user._id }});
+  } catch (err) {
+    return Promise.reject('Failed to remove user from old team')
+  }
+
+  user.save();
+  newTeam.save();
+  // old team already saved
+};
+
+/**
  * Removes the event from the BitEvent collection and all instances of it from the users (updates the user's total bits)
  * @param eventID - the event's id
- * @returns {Promise<int | null>} a promise that resolves to the number of documents updated
+ * @returns {Promise<int|null>} a promise that resolves to the number of documents updated
  */
 userSchema.statics.removeEventByID = async function(eventID) {
   return await this.removeEvent({_id: eventID});
@@ -145,7 +199,7 @@ userSchema.statics.removeEventByID = async function(eventID) {
 /**
  * Removes the event from the BitEvent collection and all instances of it from the users (updates the user's total bits)
  * @param eventQuery - the query for the event used to select the event to remove. will only remove the first event that matches the query
- * @returns {Promise<int | null>} a promise that resolves to the number of documents updated
+ * @returns {Promise<int|null>} a promise that resolves to the number of documents updated
  */
 userSchema.statics.removeEvent = async function(eventQuery) {
   let usersUpdated = null;

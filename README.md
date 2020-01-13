@@ -34,6 +34,7 @@ Edit the Slack app commands description at your [app management dashboard](https
 - /sudo_add_bit_manager
 - /sudo_remove_bit_manager
 - /sudo_add_team_lead
+- /sudo_teams: List teams, manage them, etc.
 
 TODO: more comprehensive setup instructions
 

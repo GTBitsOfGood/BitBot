@@ -18,6 +18,15 @@ const teamSchema = new Schema({
   }]
 });
 
+/**
+ * @param {Array<string>} slackIDs
+ */
+teamSchema.methods.addUsersBySlackIDs = function (slackIDs) {
+  for (const user of slackIDs) {
+    User.changeTeam(user, this._id);
+  }
+}
+
 const Team = mongoose.model('Team', teamSchema);
 
 module.exports = {

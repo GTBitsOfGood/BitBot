@@ -42,7 +42,7 @@ app.event('app_mention', async({ event, context }) => {
  * Return mentioned users in a message as a list of user IDs.
  *
  * @param {String} text of a Slack message with some mentions
- * @returns {List<String>} a list of user IDs that were mentioned
+ * @returns {Array<String>} a list of user IDs that were mentioned
  */
 function getMentions(text) {
   const mentioned = text.match(/<@*?>/g);
@@ -146,8 +146,8 @@ app.event('message_changed', async({ event, context }) => {
 /**
  * Return JSON for a one-section block, to be passed into `say`.
  * 
- * @param {String} text
- * @returns {Object}
+ * @param {string} text
+ * @returns {object}
  */
 function mrkdwnBlock(text) {
   return {
@@ -164,9 +164,9 @@ function mrkdwnBlock(text) {
 /**
  * Return JSON for ephemeral help.
  * 
- * @param {String} commandName 
- * @param {String} helpText 
- * @returns {Object}
+ * @param {string} commandName 
+ * @param {string} helpText 
+ * @returns {object}
  */
 function ephemeralHelp(commandName, helpText) {
   return {
@@ -183,10 +183,10 @@ function ephemeralHelp(commandName, helpText) {
 /**
  * Return JSON for a leaderboard, to be passed into `say`.
  * 
- * @param {Optional<int>} offset 
- * @param {Optional<int>} limit 
- * @param {Optional<String>} team 
- * @return {Object}
+ * @param {int} [offset] 
+ * @param {int} [limit] 
+ * @param {string} [team] 
+ * @return {object}
  */
 async function leaderboardBlock(offset, limit, team) {
   return await mrkdwnBlock(User.leaderboard(offset, limit, team));
